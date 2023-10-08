@@ -21,6 +21,7 @@ FROM base AS deploy
 WORKDIR /app
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
+COPY ./package.json .
 
 EXPOSE 3000
 
