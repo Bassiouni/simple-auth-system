@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,15 +15,27 @@ export class UserService {
     private readonly configService: ConfigService,
   ) {}
 
-  public async create(createUserDto: CreateUserDto) {
+  public async create({ username, password }: CreateUserDto) {
+    console.log('creating from user service');
+    if (await this.findByUsername(username)) {
+      throw new ForbiddenException(
+        `User already exists with username ${username}`,
+      );
+    }
+
+    console.log('geterating salt and getting pepper');
     const salt = await genSalt(Math.round(Math.random() * 100));
     const pepper = this.configService.getOrThrow<string>('BCRYPT_SECRET');
 
-    return await this.userRepo.save({
-      username: createUserDto.username,
-      password: await hash(createUserDto.password + pepper, salt),
+    console.log('saving to db');
+    const valFromDb = await this.userRepo.save({
+      username,
+      password: await hash(password + pepper, salt),
       salt,
     });
+    console.log({ valFromDb });
+
+    return valFromDb;
   }
 
   public async findAll() {

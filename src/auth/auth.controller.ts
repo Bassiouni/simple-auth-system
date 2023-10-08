@@ -9,8 +9,7 @@ export class AuthController {
 
   @Post('register')
   public async register(@Body() newUserDto: CreateUserDto) {
-    console.log('hello from controller');
-
+    console.log(newUserDto);
     return await this.authService.register(newUserDto);
   }
 

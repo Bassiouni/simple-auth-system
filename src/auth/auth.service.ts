@@ -1,11 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LoginUser } from './dto/login-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { hash } from 'bcrypt';
-import assert from 'assert';
 
 @Injectable()
 export class AuthService {
@@ -16,16 +19,25 @@ export class AuthService {
   ) {}
 
   public async register(createAuthDto: CreateUserDto) {
+    console.log('registering')
     const { id, username } = await this.userService.create(createAuthDto);
+    console.log({ id, username });
 
     return await this.getTokensObject(id, username);
   }
 
   public async login(loginUser: LoginUser) {
-    const { id, username, salt, password } =
-      await this.userService.findByUsername(loginUser.username);
+    const userFromDB = await this.userService.findByUsername(
+      loginUser.username,
+    );
+
+    if (Object.is(userFromDB, null)) {
+      throw new NotFoundException('User not found');
+    }
 
     const pepper = this.configService.getOrThrow<string>('BCRYPT_SECRET');
+
+    const { id, username, salt, password } = userFromDB;
 
     const authPassword = await hash(loginUser.password + pepper, salt);
 
@@ -37,24 +49,17 @@ export class AuthService {
   }
 
   private async getTokensObject(id: number, username: string) {
-    const { access_token, refresh_token } =
-      await this.updateUserWithRefreshToken(id, username);
-
-    return {
-      access_token,
-      refresh_token,
-    };
-  }
-
-  private async updateUserWithRefreshToken(id: number, username: string) {
-    const { access_token, refresh_token } = await this.genTokens(id, username);
+    const { access_token, refresh_token } = await this.generateTokens(
+      id,
+      username,
+    );
 
     await this.userService.update(id, { token: refresh_token });
 
     return { access_token, refresh_token };
   }
 
-  private async genTokens(id: number, username: string) {
+  private async generateTokens(id: number, username: string) {
     return {
       access_token: await this.genAccessToken(id, username),
 
