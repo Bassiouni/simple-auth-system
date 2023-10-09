@@ -20,8 +20,6 @@ services:
       - POSTGRES_PORT
     networks:
       - backend
-    volumes:
-      - .:/app
     depends_on:
       - db
 
