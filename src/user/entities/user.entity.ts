@@ -3,7 +3,7 @@ import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   public readonly id: number;
 
   @Column({ unique: true })

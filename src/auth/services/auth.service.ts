@@ -4,9 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/services/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { LoginUser } from './dto/login-user.dto';
+import { LoginUser } from '../dto/login-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { hash } from 'bcrypt';
 
@@ -18,10 +18,8 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  public async register(createAuthDto: CreateUserDto) {
-    console.log('registering')
-    const { id, username } = await this.userService.create(createAuthDto);
-    console.log({ id, username });
+  public async register(createUserDto: CreateUserDto) {
+    const { id, username } = await this.userService.create(createUserDto);
 
     return await this.getTokensObject(id, username);
   }
@@ -46,6 +44,10 @@ export class AuthService {
     }
 
     return await this.getTokensObject(id, username);
+  }
+
+  public async refresh(id: number, username: string) {
+    return await this.genAccessToken(id, username);
   }
 
   private async getTokensObject(id: number, username: string) {

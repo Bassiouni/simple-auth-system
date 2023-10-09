@@ -1,8 +1,8 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { genSalt, hash } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
@@ -16,24 +16,20 @@ export class UserService {
   ) {}
 
   public async create({ username, password }: CreateUserDto) {
-    console.log('creating from user service');
     if (await this.findByUsername(username)) {
       throw new ForbiddenException(
         `User already exists with username ${username}`,
       );
     }
 
-    console.log('geterating salt and getting pepper');
     const salt = await genSalt(Math.round(Math.random() * 100));
     const pepper = this.configService.getOrThrow<string>('BCRYPT_SECRET');
 
-    console.log('saving to db');
     const valFromDb = await this.userRepo.save({
       username,
       password: await hash(password + pepper, salt),
       salt,
     });
-    console.log({ valFromDb });
 
     return valFromDb;
   }
