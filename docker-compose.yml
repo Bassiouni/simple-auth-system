@@ -7,7 +7,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: deploy
     ports:
       - '3000:3000'
     env_file:
@@ -33,7 +32,7 @@ services:
     expose:
       - 5432
     ports:
-      - '5432:5432'
+      - '5430:5432'
     env_file:
       - '.env'
     networks:
@@ -48,8 +47,8 @@ services:
       PGADMIN_LISTEN_PORT: 80
     ports:
       - '8090:80'
-    networks:
-      - backend
+    # networks:
+    #   - backend
 
 networks:
   backend:

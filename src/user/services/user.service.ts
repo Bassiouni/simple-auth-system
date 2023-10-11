@@ -25,11 +25,14 @@ export class UserService {
     const salt = await genSalt(Math.round(Math.random() * 100));
     const pepper = this.configService.getOrThrow<string>('BCRYPT_SECRET');
 
+    console.log({ msg: 'saving to db' });
     const valFromDb = await this.userRepo.save({
       username,
       password: await hash(password + pepper, salt),
       salt,
     });
+
+    console.log({ valFromDb });
 
     return valFromDb;
   }

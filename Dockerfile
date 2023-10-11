@@ -1,4 +1,4 @@
-FROM node:alpine3.18 as base
+FROM node:alpine3.18
 
 RUN npm i -g pnpm
 
@@ -14,4 +14,4 @@ RUN pnpm prune --prod
 
 EXPOSE 3000
 
-CMD [ "pnpm", "start" ]
+CMD [ "pnpm", "start:prod" ]
