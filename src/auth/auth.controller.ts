@@ -13,36 +13,33 @@ export class AuthController {
   public async register(
     @Body('username') username: string,
     @Body('password') password: string,
-    @Res() response: Response,
+    @Res({ passthrough: true }) response: Response,
   ) {
     const { access_token, refresh_token } = await this.authService.register({
       username,
       password,
     });
 
-    response
+    return response
       .setHeader('Access-Token', access_token)
       .setHeader('Refresh-Token', refresh_token);
-
-    return {};
   }
 
   @Post('login')
   public async login(
     @Body('username') username: string,
     @Body('password') password: string,
-    @Res() response: Response,
+    @Res({ passthrough: true }) response: Response,
   ) {
     const { access_token, refresh_token } = await this.authService.login({
       username,
       password,
     });
 
-    response
+    // response.cookie
+    return response
       .setHeader('Access-Token', access_token)
       .setHeader('Refresh-Token', refresh_token);
-
-    return {};
   }
 
   @Put('refresh')
@@ -54,7 +51,7 @@ export class AuthController {
   public async refresh(
     @Body('id') id: number,
     @Body('username') username: string,
-    @Res() response: Response,
+    @Res({ passthrough: true }) response: Response,
   ) {
     const access_token = await this.authService.refresh(id, username);
     response.setHeader('Access-Token', access_token);

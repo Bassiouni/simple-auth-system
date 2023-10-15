@@ -22,7 +22,7 @@ export class UserService {
       );
     }
 
-    const salt = await genSalt(Math.round(Math.random() * 100));
+    const salt = await genSalt(Math.round(Math.random() * 10));
     const pepper = this.configService.getOrThrow<string>('BCRYPT_SECRET');
 
     console.log({ msg: 'saving to db' });

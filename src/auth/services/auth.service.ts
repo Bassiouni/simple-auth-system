@@ -33,7 +33,7 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    const pepper = this.configService.getOrThrow<string>('BCRYPT_SECRET');
+    const pepper = this.configService.getOrThrow<string>('bcrypt_password');
 
     const { id, username, salt, password } = userFromDB;
 
@@ -73,7 +73,7 @@ export class AuthService {
     return await this.jwtService.signAsync(
       { sub: id, username },
       {
-        secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
+        secret: this.configService.getOrThrow<string>('access_token_secret'),
         expiresIn: '15m',
       },
     );
@@ -83,7 +83,7 @@ export class AuthService {
     return await this.jwtService.signAsync(
       { sub: id, username },
       {
-        secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
+        secret: this.configService.getOrThrow<string>('refresh_token_secret'),
         expiresIn: '7d',
       },
     );

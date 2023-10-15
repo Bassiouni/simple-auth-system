@@ -7,9 +7,7 @@ import {
 
 @Injectable()
 export class RefreshTokenHeaderGuard implements CanActivate {
-  constructor() {}
-
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  public async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
 
     const refreshTokenFromHeader = req.headers['refresh-token'] as string;

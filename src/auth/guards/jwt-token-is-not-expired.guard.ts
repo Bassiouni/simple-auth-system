@@ -27,7 +27,7 @@ export class JwtTokenIsNotExpiredGuard implements CanActivate {
       const refreshToken = await this.jwtService.verifyAsync(
         refreshTokenFromHeader,
         {
-          secret: this.configService.getOrThrow('JWT_REFRESH_SECRET'),
+          secret: this.configService.getOrThrow('refresh_token_secret'),
           ignoreExpiration: false,
         },
       );
@@ -44,7 +44,7 @@ export class JwtTokenIsNotExpiredGuard implements CanActivate {
         const { sub: id } = await this.jwtService.verifyAsync(
           refreshTokenFromHeader,
           {
-            secret: this.configService.getOrThrow('JWT_REFRESH_SECRET'),
+            secret: this.configService.getOrThrow('refresh_token_secret'),
             ignoreExpiration: true,
           },
         );
