@@ -10,7 +10,7 @@ export class RefreshTokenHeaderGuard implements CanActivate {
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
 
-    const refreshTokenFromHeader = req.headers['refresh-token'] as string;
+    const refreshTokenFromHeader = req.body['refresh_token'] as string;
 
     if (!refreshTokenFromHeader) {
       throw new BadRequestException(

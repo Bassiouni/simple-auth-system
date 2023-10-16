@@ -14,13 +14,11 @@ export class JwtRefreshTokenGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
 
-    const refreshToken = req.headers['refresh-token'] as string;
-
-    const { id: userid } = req.body;
+    const { id: userid, refresh_token } = req.body;
 
     const { token, id, username } = await this.userService.findOneByID(userid);
 
-    if (!Object.is(token, refreshToken)) {
+    if (!Object.is(token, refresh_token)) {
       throw new BadRequestException('incorrect token');
     }
 

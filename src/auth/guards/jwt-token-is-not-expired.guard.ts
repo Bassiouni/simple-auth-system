@@ -21,35 +21,29 @@ export class JwtTokenIsNotExpiredGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
 
-    const refreshTokenFromHeader = req.headers['refresh-token'] as string;
+    const { refresh_token } = req.body;
 
     try {
-      const refreshToken = await this.jwtService.verifyAsync(
-        refreshTokenFromHeader,
-        {
-          secret: this.configService.getOrThrow('refresh_token_secret'),
-          ignoreExpiration: false,
-        },
-      );
+      const refreshTokenValue = await this.jwtService.verifyAsync(refresh_token, {
+        secret: this.configService.getOrThrow('refresh_token_secret'),
+        ignoreExpiration: false,
+      });
 
-      if (!refreshToken) {
+      if (!refreshTokenValue) {
         throw new BadRequestException('Unverified Token');
       }
 
-      const { sub: id } = refreshToken;
+      const { sub: id } = refreshTokenValue;
 
       req.body = { ...req.body, id };
     } catch (e: unknown) {
       if (e instanceof JsonWebTokenError && e.name === 'TokenExpiredError') {
-        const { sub: id } = await this.jwtService.verifyAsync(
-          refreshTokenFromHeader,
-          {
-            secret: this.configService.getOrThrow('refresh_token_secret'),
-            ignoreExpiration: true,
-          },
-        );
+        const { sub: id } = await this.jwtService.verifyAsync(refresh_token, {
+          secret: this.configService.getOrThrow('refresh_token_secret'),
+          ignoreExpiration: true,
+        });
 
-        this.userService.update(id, { token: null });
+        await this.userService.update(id, { token: null });
 
         return false;
       }

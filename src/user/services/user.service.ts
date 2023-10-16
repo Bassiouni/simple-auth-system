@@ -22,19 +22,17 @@ export class UserService {
       );
     }
 
-    const salt = await genSalt(Math.round(Math.random() * 10));
-    const pepper = this.configService.getOrThrow<string>('BCRYPT_SECRET');
+    const saltRounds = Math.round(Math.random() * 10);
+    const pepper = this.configService.getOrThrow<string>('bcrypt_password');
 
-    console.log({ msg: 'saving to db' });
-    const valFromDb = await this.userRepo.save({
-      username,
-      password: await hash(password + pepper, salt),
+    const salt = await genSalt(saltRounds);
+    const hashed = await hash(password + pepper, salt);
+
+    return await this.userRepo.save({
+      username: username,
+      password: hashed,
       salt,
     });
-
-    console.log({ valFromDb });
-
-    return valFromDb;
   }
 
   public async findAll() {
