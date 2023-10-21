@@ -1,21 +1,34 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
+const {
+  ENV,
+  POSTGRES_HOST,
+  POSTGRES_PORT,
+  POSTGRES_USER,
+  POSTGRES_PASSWORD,
+  POSTGRES_DB,
+  PORT,
+  BCRYPT_SECRET,
+  JWT_ACCESS_SECRET,
+  JWT_REFRESH_SECRET,
+} = process.env;
+
 const database: TypeOrmModuleOptions = {
   type: 'postgres',
-  host: process.env.POSTGRES_HOST,
-  port: Number(process.env.POSTGRES_PORT),
-  username: process.env.POSTGRES_USER,
-  password: process.env.POSTGRES_PASSWORD,
-  database: process.env.POSTGRES_DB,
+  host: POSTGRES_HOST,
+  port: Number(POSTGRES_PORT),
+  username: POSTGRES_USER,
+  password: POSTGRES_PASSWORD,
+  database: POSTGRES_DB,
   synchronize: true,
   autoLoadEntities: true,
-}
+};
 
 export const config = () => ({
-  env: process.env.ENV,
-  port: Number(process.env.PORT),
-  bcrypt_password: process.env.BCRYPT_SECRET,
-  access_token_secret: process.env.JWT_ACCESS_SECRET,
-  refresh_token_secret: process.env.JWT_REFRESH_SECRET,
+  env: ENV,
+  port: Number(PORT),
+  bcrypt_password: BCRYPT_SECRET,
+  access_token_secret: JWT_ACCESS_SECRET,
+  refresh_token_secret: JWT_REFRESH_SECRET,
   database,
 });
