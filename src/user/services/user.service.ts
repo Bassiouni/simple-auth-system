@@ -29,7 +29,7 @@ export class UserService {
     const hashed = await hash(password + pepper, salt);
 
     return await this.userRepo.save({
-      username: username,
+      username,
       password: hashed,
       salt,
     });
