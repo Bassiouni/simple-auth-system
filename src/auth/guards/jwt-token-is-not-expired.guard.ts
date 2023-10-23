@@ -10,7 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import { Request } from 'express';
 import { UserService } from 'src/user/services/user.service';
-import { AuthStrategy } from '../strategies/auth.strategy';
+import { AuthStrategy } from '../strategies/auth.strategy.interface';
 
 @Injectable()
 export class JwtTokenIsNotExpiredGuard implements CanActivate {
@@ -28,9 +28,9 @@ export class JwtTokenIsNotExpiredGuard implements CanActivate {
     const { refresh_token } = req.body;
 
     try {
-      await this.authStrategy.verifyToken(refresh_token);
-
-      const refreshTokenValue = this.authStrategy.getTokenValue();
+      const refreshTokenValue = await this.authStrategy.verify(refresh_token, {
+        config_name: 'refresh_token_secret',
+      });
 
       if (!refreshTokenValue) {
         throw new BadRequestException('Unverified Token');

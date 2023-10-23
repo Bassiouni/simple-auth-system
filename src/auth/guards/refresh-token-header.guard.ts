@@ -4,6 +4,7 @@ import {
   ExecutionContext,
   Injectable,
 } from '@nestjs/common';
+import { Request } from 'express';
 
 @Injectable()
 export class RefreshTokenHeaderGuard implements CanActivate {

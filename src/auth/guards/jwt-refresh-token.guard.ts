@@ -16,13 +16,14 @@ export class JwtRefreshTokenGuard implements CanActivate {
 
     const { id: userid, refresh_token } = req.body;
 
-    const { token, id, username } = await this.userService.findOneByID(userid);
+    const { token, id, username, roles } =
+      await this.userService.findOneByID(userid);
 
     if (!Object.is(token, refresh_token)) {
       throw new BadRequestException('incorrect token');
     }
 
-    req.body = { ...req.body, id, username };
+    req.body = { ...req.body, id, username, roles };
 
     return true;
   }

@@ -10,8 +10,8 @@ import { LoginUser } from '../dto/login-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { hash } from 'bcrypt';
 import { User } from 'src/user/entities/user.entity';
-
-type TokenClusterType = { access_token: string; refresh_token: string };
+import { TokenClusterType } from 'src/types/token-cluster-type';
+import { Role } from 'src/user/enums/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -24,9 +24,10 @@ export class AuthService {
   public async register(
     createUserDto: CreateUserDto,
   ): Promise<TokenClusterType> {
-    const { id, username } = await this.userService.create(createUserDto);
+    const { id, username, roles } =
+      await this.userService.create(createUserDto);
 
-    return await this.getTokensObject(id, username);
+    return await this.getTokensObject(id, username, roles);
   }
 
   public async login(loginUser: LoginUser): Promise<TokenClusterType> {
@@ -40,7 +41,7 @@ export class AuthService {
 
     const pepper = this.configService.getOrThrow<string>('bcrypt_password');
 
-    const { id, username, salt, password: passwordFromDb } = userFromDB;
+    const { id, username, salt, password: passwordFromDb, roles } = userFromDB;
 
     const authPassword = await hash(loginUser.password + pepper, salt);
 
@@ -48,20 +49,26 @@ export class AuthService {
       throw new BadRequestException('incorrect username or password');
     }
 
-    return await this.getTokensObject(id, username);
+    return await this.getTokensObject(id, username, roles);
   }
 
-  public async refresh(id: number, username: string): Promise<string> {
-    return await this.genAccessToken(id, username);
+  public async refresh(
+    id: string,
+    username: string,
+    roles: Role[],
+  ): Promise<string> {
+    return await this.genAccessToken(id, username, roles);
   }
 
   private async getTokensObject(
-    id: number,
+    id: string,
     username: string,
+    roles: Role[],
   ): Promise<TokenClusterType> {
     const { access_token, refresh_token } = await this.generateTokens(
       id,
       username,
+      roles,
     );
 
     await this.userService.update(id, { token: refresh_token });
@@ -70,11 +77,12 @@ export class AuthService {
   }
 
   private async generateTokens(
-    id: number,
+    id: string,
     username: string,
+    roles: Role[],
   ): Promise<TokenClusterType> {
-    const access_token = await this.genAccessToken(id, username);
-    const refresh_token = await this.genRefreshToken(id, username);
+    const access_token = await this.genAccessToken(id, username, roles);
+    const refresh_token = await this.genRefreshToken(id, username, roles);
 
     return {
       access_token,
@@ -82,9 +90,13 @@ export class AuthService {
     };
   }
 
-  private async genAccessToken(id: number, username: string): Promise<string> {
+  private async genAccessToken(
+    id: string,
+    username: string,
+    roles: Role[],
+  ): Promise<string> {
     return await this.jwtService.signAsync(
-      { sub: id, username },
+      { sub: id, username, roles },
       {
         secret: this.configService.getOrThrow<string>('access_token_secret'),
         expiresIn: '15m',
@@ -92,9 +104,13 @@ export class AuthService {
     );
   }
 
-  private async genRefreshToken(id: number, username: string): Promise<string> {
+  private async genRefreshToken(
+    id: string,
+    username: string,
+    roles: Role[],
+  ): Promise<string> {
     return await this.jwtService.signAsync(
-      { sub: id, username },
+      { sub: id, username, roles },
       {
         secret: this.configService.getOrThrow<string>('refresh_token_secret'),
         expiresIn: '7d',

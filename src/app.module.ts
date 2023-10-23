@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
-import { config } from './config/configs';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { DatabaseConfig } from './config/database.config';
 import { JwtModule } from '@nestjs/jwt';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
+import { config } from './config/configs';
+import { DatabaseConfig } from './config/database.config';
+import { ControlPanelModule } from './control-panel/control-panel.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     AuthModule,
     UserModule,
+    ControlPanelModule,
   ],
 })
 export class AppModule {}

@@ -6,6 +6,7 @@ import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { genSalt, hash } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
+import { Role } from '../enums/role.enum';
 
 @Injectable()
 export class UserService {
@@ -32,6 +33,7 @@ export class UserService {
       username,
       password: hashed,
       salt,
+      roles: [Role.User, Role.Admin],
     });
   }
 
@@ -39,7 +41,7 @@ export class UserService {
     return await this.userRepo.find();
   }
 
-  public async findOneByID(id: number) {
+  public async findOneByID(id: string) {
     return await this.userRepo.findOneBy({ id });
   }
 
@@ -47,11 +49,11 @@ export class UserService {
     return await this.userRepo.findOneBy({ username });
   }
 
-  public async update(id: number, updateUserDto: UpdateUserDto) {
+  public async update(id: string, updateUserDto: UpdateUserDto) {
     return await this.userRepo.update(id, updateUserDto);
   }
 
-  public async remove(id: number) {
+  public async remove(id: string) {
     return await this.userRepo.delete(id);
   }
 }
