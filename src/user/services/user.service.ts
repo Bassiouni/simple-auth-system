@@ -33,7 +33,7 @@ export class UserService {
       username,
       password: hashed,
       salt,
-      roles: [Role.User, Role.Admin],
+      roles: [Role.User],
     });
   }
 
