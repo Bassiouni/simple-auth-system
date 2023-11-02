@@ -1,9 +1,8 @@
 import { Controller, Post, Body, Put, UseGuards } from '@nestjs/common';
-import { JwtTokenIsNotExpiredGuard } from 'src/auth/guards/jwt-token-is-not-expired.guard';
-import { RefreshTokenHeaderGuard } from 'src/auth/guards/refresh-token-header.guard';
 import { AuthService } from './services/auth.service';
 import { JwtRefreshTokenGuard } from './guards/jwt-refresh-token.guard';
-import { Role } from 'src/user/enums/role.enum';
+import { CurrentUser } from 'src/decorators/user.decorator';
+import { UserType } from 'src/types/user.type';
 
 @Controller('auth')
 export class AuthController {
@@ -42,17 +41,12 @@ export class AuthController {
   }
 
   @Put('refresh')
-  @UseGuards(
-    RefreshTokenHeaderGuard,
-    JwtTokenIsNotExpiredGuard,
-    JwtRefreshTokenGuard,
-  )
-  public async refresh(
-    @Body('id') id: string,
-    @Body('username') username: string,
-    @Body('roles') roles: Role[],
-  ) {
+  @UseGuards(JwtRefreshTokenGuard)
+  public async refresh(@CurrentUser() user: UserType) {
+    const { id, username, roles } = user;
+
     const access_token = await this.authService.refresh(id, username, roles);
+
     return {
       access_token,
     };

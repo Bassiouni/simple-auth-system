@@ -3,7 +3,7 @@ import { UserService } from './services/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { UserController } from './user.controller';
-import { JwtTokenStrategy } from 'src/auth/strategies/verify-access-token.strategy';
+import { JwtAccessTokenStrategy } from 'src/auth/strategies/jwt-access-token.strategy';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
@@ -12,14 +12,14 @@ import { JwtTokenStrategy } from 'src/auth/strategies/verify-access-token.strate
     UserService,
     {
       provide: 'AuthStrategy',
-      useClass: JwtTokenStrategy,
+      useClass: JwtAccessTokenStrategy,
     },
   ],
   exports: [
     UserService,
     {
       provide: 'AuthStrategy',
-      useClass: JwtTokenStrategy,
+      useClass: JwtAccessTokenStrategy,
     },
   ],
 })

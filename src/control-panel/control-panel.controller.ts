@@ -2,11 +2,11 @@ import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
 import { UserService } from 'src/user/services/user.service';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/user/enums/role.enum';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { JwtAccessTokenGuard } from 'src/auth/guards/jwt-access-token.guard';
 
 @Controller('control-panel')
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(JwtAccessTokenGuard, RolesGuard)
 @Roles(Role.Admin)
 export class ControlPanelController {
   constructor(private readonly userService: UserService) {}

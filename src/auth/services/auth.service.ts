@@ -96,7 +96,7 @@ export class AuthService {
     roles: Role[],
   ): Promise<string> {
     return await this.jwtService.signAsync(
-      { sub: id, username, roles },
+      { id, username, roles },
       {
         secret: this.configService.getOrThrow<string>('access_token_secret'),
         expiresIn: '15m',
@@ -110,7 +110,7 @@ export class AuthService {
     roles: Role[],
   ): Promise<string> {
     return await this.jwtService.signAsync(
-      { sub: id, username, roles },
+      { id, username, roles },
       {
         secret: this.configService.getOrThrow<string>('refresh_token_secret'),
         expiresIn: '7d',

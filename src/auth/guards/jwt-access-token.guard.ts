@@ -1,12 +1,12 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import { Injectable, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { IS_PUBLIC_KEY } from '../../decorators/public.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
-import { IS_PUBLIC_KEY } from 'src/decorators/public.decorator';
 
 @Injectable()
-export class JwtRefreshTokenGuard extends AuthGuard(
-  'jwt-refresh-token-strategy',
+export class JwtAccessTokenGuard extends AuthGuard(
+  'jwt-access-token-strategy',
 ) {
   constructor(private readonly reflector: Reflector) {
     super();
